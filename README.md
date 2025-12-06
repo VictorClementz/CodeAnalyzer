@@ -1,1 +1,1 @@
-Deployed at: https://codeanalyzer-frontend.onrender.com/
+Deployed at: https://codeanalyzer-f1xp.onrender.com
