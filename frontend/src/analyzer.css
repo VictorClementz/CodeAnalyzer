@@ -1,0 +1,114 @@
+/* src/Analyzer.css - Minimalist Overhaul */
+:root {
+    --accent-color: #00796b; /* Deep Teal/Cyan */
+    --text-color: #212121;
+    --background-color: #ffffff;
+    --light-gray: #f5ffef; /* Very light subtle background for results */
+    --border-color: #cfd8dc; /* Light gray border */
+    --font-mono: 'Fira Code', 'Consolas', 'Courier New', monospace;
+}
+
+body {
+    background-color: var(--background-color);
+    font-family: 'Inter', 'Segoe UI', sans-serif; /* Clean, modern font stack */
+    color: var(--text-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+/* --- Typography & Headers --- */
+h1 {
+    color: var(--accent-color);
+    font-size: 2em;
+    margin-bottom: 0.2em;
+}
+
+h2 {
+    color: var(--text-color);
+    font-size: 1.5em;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eceff1; /* Very faint separator */
+}
+
+/* --- Code Input --- */
+.code-input {
+    width: 100%;
+    height: 350px; /* Fixed height for consistent look */
+    padding: 20px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #f7f9fc; /* Off-white for code area */
+}
+
+.code-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(0, 121, 107, 0.2); /* Subtle focus ring */
+}
+
+/* --- Button --- */
+button {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color 0.2s, opacity 0.2s;
+    float: right; /* Align button to the right of the input area */
+}
+
+button:hover:not(:disabled) {
+    background-color: #004d40; /* Darker accent on hover */
+}
+
+button:disabled {
+    background-color: #b2dfdb;
+    cursor: not-allowed;
+}
+
+/* --- Results --- */
+.results {
+    clear: both; /* Ensures results div is below the floating button */
+    padding: 20px;
+    background-color: var(--light-gray);
+    border-left: 5px solid var(--accent-color); /* The only strong visual marker */
+    border-radius: 4px;
+    margin-top: 30px;
+}
+
+.results ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.results li {
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+/* Score Visuals (using high-contrast text) */
+.score-high { color: #388e3c; font-weight: bold; } /* Green for good */
+.score-medium { color: #f9a825; font-weight: bold; } /* Amber for medium */
+.score-low { color: #c62828; font-weight: bold; } /* Red for poor */
+
+.error {
+    color: #c62828;
+    font-weight: bold;
+}
