@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import './analyzer.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function CodeAnalyzer() {
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('python');
@@ -19,7 +21,7 @@ function CodeAnalyzer() {
     setResults(null);
 
     try {
-      const response = await fetch('https://codeanalyzer-5i7r.onrender.com/analyze', {
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,10 +109,10 @@ function CodeAnalyzer() {
                 <span className="score-max">/100</span>
               </div>
               <div className="score-description">
-                {results.readability_score >= 80 && 'Excellent - Highly maintainable'}
-                {results.readability_score >= 60 && results.readability_score < 80 && 'Good - Well structured'}
-                {results.readability_score >= 40 && results.readability_score < 60 && 'Fair - Room for improvement'}
-                {results.readability_score < 40 && 'Needs work - Consider refactoring'}
+                {results.readability_score >= 80 && 'Excellent(For now)'}
+                {results.readability_score >= 60 && results.readability_score < 80 && 'Good(enough, git merge origin main --force)'}
+                {results.readability_score >= 40 && results.readability_score < 60 && 'Chatgpt: Refactor this code'}
+                {results.readability_score < 40 && 'Shit spagetti code'}
               </div>
             </div>
 
@@ -138,7 +140,25 @@ function CodeAnalyzer() {
                 <div className="metric-value">{results.comment_density ? `${results.comment_density}%` : 'N/A'}</div>
                 <div className="metric-description">Documentation coverage</div>
               </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Duplication Percentage</div>
+                <div className="metric-value">{results.duplication_percentage ? `${results.duplication_percentage}%` : 'N/A'}</div>
+                <div className="metric-description">Duplication coverage</div>
+              </div>
+
+               <div className="metric-card">
+                <div className="metric-label">Average Variable Length</div>
+                <div className="metric-value">{results.avg_name_length || 'N/A'}</div>
+                <div className="metric-description">Documentation coverage</div>
+              </div>
             </div>
+
+            
+            
+
+
+            
 
             {results.suggestions && results.suggestions.length > 0 && (
               <div className="suggestions-section">
@@ -155,7 +175,7 @@ function CodeAnalyzer() {
       </main>
 
       <footer className="footer">
-        <p>Built with React + Flask • Powered by Radon</p>
+        <p>In development</p>
       </footer>
     </div>
   );

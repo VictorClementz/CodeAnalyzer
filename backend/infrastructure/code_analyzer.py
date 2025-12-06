@@ -1,60 +1,38 @@
-from radon.raw import analyze
-from radon.complexity import cc_visit
-from radon.metrics import mi_visit
+from .metrics.basic import (
+    calculate_lines, calculate_complexity, calculate_maintainability, 
+    calculate_comment_density, calculate_function_length
+)
+from .metrics.ast_analysis import calculate_duplication_ast, calculate_naming_quality
+from .scoring import calculate_readability_score, config
 
-def analyze_code(code, language):
-    lines = _calculate_lines(code)
-    complexity = _calculate_complexity(code)
-    maintainability = _calculate_maintainability(code)
-    readability = _calculate_readability_score(lines, complexity, maintainability)
+def analyze_code(code, language, user_config=None):
+    current_config = user_config if user_config else config
+
+    #Simple radon
+    lines = calculate_lines(code)
+    complexity = calculate_complexity(code)
+    maintainability = calculate_maintainability(code)
+    comment_density = calculate_comment_density(code)
+    function_length = calculate_function_length(code)
+
+    #Complex form AST
+    duplication_percentage, duplicated_blocks_info = calculate_duplication_ast(code)
+    naming_metrics = calculate_naming_quality(code)
+    
+    readability = calculate_readability_score(lines, complexity, maintainability)
     
     return {
         'lines_of_code': lines,
         'cyclomatic_complexity': complexity,
         'maintainability_index': maintainability,
-        'readability_score': readability
+        'readability_score': readability,
+        'comment_density': comment_density,
+        'avg_function_length': function_length['avg'],
+        'max_function_length': function_length['max'],
+        
+        'duplication_percentage': duplication_percentage,
+        'duplicated_blocks_info': duplicated_blocks_info,
+        'avg_name_length': naming_metrics['avg_name_length'],
+        'single_letter_warnings': naming_metrics['single_letter_warnings'],
+        'unclear_name_flags': naming_metrics['unclear_name_flags']
     }
-
-def _calculate_lines(code):
-    raw_metrics = analyze(code)
-    return raw_metrics.sloc
-
-def _calculate_complexity(code):
-    complexity_results = cc_visit(code)
-    
-    if complexity_results:
-        avg_complexity = sum(result.complexity for result in complexity_results) / len(complexity_results)
-        return round(avg_complexity, 2)
-    return 0
-
-def _calculate_maintainability(code):
-    mi_score = mi_visit(code, multi=True)
-    
-    if mi_score:
-        return round(mi_score, 2)
-    return 0
-
-def _calculate_readability_score(lines, complexity, maintainability):
-    # Maintainability contributes 50%
-    mi_score = maintainability * 0.5
-    
-    # Complexity contributes 30%
-    if complexity <= 5:
-        complexity_score = 100
-    elif complexity <= 10:
-        complexity_score = 70
-    else:
-        complexity_score = max(0, 100 - (complexity * 5))
-    complexity_score *= 0.3
-    
-    # Lines contributes 20%
-    if lines < 100:
-        lines_score = 100
-    elif lines < 300:
-        lines_score = 70
-    else:
-        lines_score = max(0, 100 - (lines / 10))
-    lines_score *= 0.2
-    
-    total_score = mi_score + complexity_score + lines_score
-    return round(total_score, 2)
