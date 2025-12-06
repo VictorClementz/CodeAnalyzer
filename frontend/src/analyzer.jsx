@@ -109,10 +109,10 @@ function CodeAnalyzer() {
                 <span className="score-max">/100</span>
               </div>
               <div className="score-description">
-                {results.readability_score >= 80 && 'Excellent - Highly maintainable'}
-                {results.readability_score >= 60 && results.readability_score < 80 && 'Good - Well structured'}
-                {results.readability_score >= 40 && results.readability_score < 60 && 'Fair - Room for improvement'}
-                {results.readability_score < 40 && 'Needs work - Consider refactoring'}
+                {results.readability_score >= 80 && 'Excellent(For now)'}
+                {results.readability_score >= 60 && results.readability_score < 80 && 'Good(enough, git merge origin main --force)'}
+                {results.readability_score >= 40 && results.readability_score < 60 && 'Chatgpt: Refactor this code'}
+                {results.readability_score < 40 && 'Shit spagetti code'}
               </div>
             </div>
 
@@ -146,6 +146,12 @@ function CodeAnalyzer() {
                 <div className="metric-value">{results.duplication_percentage ? `${results.duplication_percentage}%` : 'N/A'}</div>
                 <div className="metric-description">Documentation coverage</div>
               </div>
+
+               <div className="metric-card">
+                <div className="metric-label">Average Variable Length</div>
+                <div className="metric-value">{results.avg_name_length || 'N/A'}</div>
+                <div className="metric-description">Documentation coverage</div>
+              </div>
             </div>
 
             
@@ -169,7 +175,7 @@ function CodeAnalyzer() {
       </main>
 
       <footer className="footer">
-        <p>Built with React + Flask • Powered by Radon</p>
+        <p>In development</p>
       </footer>
     </div>
   );
