@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from infrastructure.code_analyzer import analyze_code
+import traceback
 
 analyze_bp = Blueprint('analyze', __name__)
 
@@ -21,4 +22,6 @@ def analyze():
         return jsonify(results), 200
         
     except Exception as e:
+        print(f"ERROR: {str(e)}")  # ADD THIS LINE
+        traceback.print_exc()      # ADD THIS LINE
         return jsonify({'error': str(e)}), 500

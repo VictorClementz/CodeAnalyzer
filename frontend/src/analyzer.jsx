@@ -1,62 +1,164 @@
-// src/Analyzer.jsx - Clean Markup
+import { useState } from 'react';
+import './analyzer.css';
 
-// ... (imports and helper functions remain the same) ...
+function CodeAnalyzer() {
+  const [code, setCode] = useState('');
+  const [language, setLanguage] = useState('python');
+  const [results, setResults] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-function Analyzer() {
-    // ... (state and handleAnalyze logic remain the same) ...
+  const analyzeCode = async () => {
+    if (!code.trim()) {
+      setError('Please paste some code to analyze');
+      return;
+    }
 
-    const renderResults = () => {
-        if (loading) return <p>Processing analysis...</p>;
-        if (error) return <p className="error">🚫 {error}</p>;
-        if (!results) return <p>Paste your code snippet above and click "Analyze Code" to evaluate its readability.</p>;
+    setLoading(true);
+    setError(null);
+    setResults(null);
 
-        const score = results.readability_score || 'N/A';
-        const complexity = results.cyclomatic_complexity || 'N/A';
-        const maintainability = results.maintainability_index || 'N/A';
-        const message = results.message || '';
+    try {
+      const response = await fetch('http://localhost:5002/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: code,
+          language: language
+        }),
+      });
 
-        return (
-            <>
-                <h3>Analysis Summary</h3>
-                <p>
-                    <strong>Overall Readability Score:</strong> 
-                    <span 
-                        className={getScoreClass(score)}
-                        style={{ fontSize: '1.4em' }}
-                    >
-                        {score}/100
-                    </span>
-                </p>
-                <ul>
-                    <li><strong>Cyclomatic Complexity (Avg.):</strong> {complexity} (Low is better)</li>
-                    <li><strong>Maintainability Index:</strong> {maintainability} ({results.maintainability_rank})</li>
-                </ul>
-                {message && <p className="message">💡 **Feedback:** {message}</p>}
-            </>
-        );
-    };
+      if (!response.ok) {
+        throw new Error('Analysis failed');
+      }
 
-    return (
-        <div className="container">
-            <h1>Code Readability Analyzer</h1>
-            <p>A simple, clean tool for developers to objectively evaluate Python code snippets.</p>
-            
-            <textarea
-                className="code-input"
-                placeholder="Paste your Python code snippet here..."
-                value={codeSnippet}
-                onChange={(e) => setCodeSnippet(e.target.value)}
-            />
+      const data = await response.json();
+      setResults(data);
+    } catch (err) {
+      setError('Failed to analyze code. Make sure the backend server is running on port 5002.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <button onClick={handleAnalyze} disabled={loading}>
-                {loading ? 'Analyzing...' : 'Analyze Code'}
-            </button>
+  const getScoreColor = (score) => {
+    if (score >= 80) return 'excellent';
+    if (score >= 60) return 'good';
+    if (score >= 40) return 'fair';
+    return 'poor';
+  };
 
-            <div className="results">
-                {renderResults()}
-            </div>
+  return (
+    <div className="analyzer-container">
+      <header className="header">
+        <div className="header-content">
+          <h1 className="title">Code Readability Analyzer</h1>
+          <p className="subtitle">Quantify your code's maintainability and clarity</p>
         </div>
-    );
+      </header>
+
+      <main className="main-content">
+        <div className="input-section">
+          <div className="controls">
+            <select 
+              value={language} 
+              onChange={(e) => setLanguage(e.target.value)}
+              className="language-select"
+            >
+              <option value="python">Python</option>
+              <option value="javascript">JavaScript</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+            </select>
+            
+            <button 
+              onClick={analyzeCode} 
+              disabled={loading || !code.trim()}
+              className="analyze-button"
+            >
+              {loading ? 'Analyzing...' : 'Analyze Code'}
+            </button>
+          </div>
+
+          <textarea
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder="Paste your code here..."
+            className="code-input"
+            spellCheck="false"
+          />
+        </div>
+
+        {error && (
+          <div className="error-message">
+            <span className="error-icon">⚠</span>
+            {error}
+          </div>
+        )}
+
+        {results && (
+          <div className="results-section">
+            <div className="score-card">
+              <div className="score-label">Readability Score</div>
+              <div className={`score-value ${getScoreColor(results.readability_score)}`}>
+                {results.readability_score}
+                <span className="score-max">/100</span>
+              </div>
+              <div className="score-description">
+                {results.readability_score >= 80 && 'Excellent - Highly maintainable'}
+                {results.readability_score >= 60 && results.readability_score < 80 && 'Good - Well structured'}
+                {results.readability_score >= 40 && results.readability_score < 60 && 'Fair - Room for improvement'}
+                {results.readability_score < 40 && 'Needs work - Consider refactoring'}
+              </div>
+            </div>
+
+            <div className="metrics-grid">
+              <div className="metric-card">
+                <div className="metric-label">Cyclomatic Complexity</div>
+                <div className="metric-value">{results.cyclomatic_complexity || 'N/A'}</div>
+                <div className="metric-description">Number of execution paths</div>
+              </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Maintainability Index</div>
+                <div className="metric-value">{results.maintainability_index || 'N/A'}</div>
+                <div className="metric-description">Industry standard metric</div>
+              </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Lines of Code</div>
+                <div className="metric-value">{results.lines_of_code || 'N/A'}</div>
+                <div className="metric-description">Total line count</div>
+              </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Comment Density</div>
+                <div className="metric-value">{results.comment_density ? `${results.comment_density}%` : 'N/A'}</div>
+                <div className="metric-description">Documentation coverage</div>
+              </div>
+            </div>
+
+            {results.suggestions && results.suggestions.length > 0 && (
+              <div className="suggestions-section">
+                <h3 className="suggestions-title">Suggestions for Improvement</h3>
+                <ul className="suggestions-list">
+                  {results.suggestions.map((suggestion, index) => (
+                    <li key={index} className="suggestion-item">{suggestion}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      <footer className="footer">
+        <p>Built with React + Flask • Powered by Radon</p>
+      </footer>
+    </div>
+  );
 }
 
-// ... (export default Analyzer) ...
+export default CodeAnalyzer;
