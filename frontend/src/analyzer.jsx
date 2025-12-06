@@ -21,7 +21,7 @@ function CodeAnalyzer() {
     setResults(null);
 
     try {
-      const response = await fetch('http://localhost:5002/analyze', {
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ function CodeAnalyzer() {
               <div className="metric-card">
                 <div className="metric-label">Duplication Percentage</div>
                 <div className="metric-value">{results.duplication_percentage ? `${results.duplication_percentage}%` : 'N/A'}</div>
-                <div className="metric-description">Documentation coverage</div>
+                <div className="metric-description">Duplication coverage</div>
               </div>
 
                <div className="metric-card">
