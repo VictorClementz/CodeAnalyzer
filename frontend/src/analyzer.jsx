@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import './analyzer.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function CodeAnalyzer() {
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('python');
@@ -19,7 +21,7 @@ function CodeAnalyzer() {
     setResults(null);
 
     try {
-      const response = await fetch('https://codeanalyzer-5i7r.onrender.com/analyze', {
+      const response = await fetch('http://localhost:5002/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +140,19 @@ function CodeAnalyzer() {
                 <div className="metric-value">{results.comment_density ? `${results.comment_density}%` : 'N/A'}</div>
                 <div className="metric-description">Documentation coverage</div>
               </div>
+
+              <div className="metric-card">
+                <div className="metric-label">Duplication Percentage</div>
+                <div className="metric-value">{results.duplication_percentage ? `${results.duplication_percentage}%` : 'N/A'}</div>
+                <div className="metric-description">Documentation coverage</div>
+              </div>
             </div>
+
+            
+            
+
+
+            
 
             {results.suggestions && results.suggestions.length > 0 && (
               <div className="suggestions-section">
