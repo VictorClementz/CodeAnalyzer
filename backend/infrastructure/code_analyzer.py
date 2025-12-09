@@ -2,7 +2,7 @@ from .metrics.basic import (
     calculate_lines, calculate_complexity, calculate_maintainability, 
     calculate_comment_density, calculate_function_length
 )
-from .metrics.ast_analysis import calculate_duplication_ast, calculate_naming_quality
+from .metrics.ast_analysis import calculate_duplication_ast, calculate_naming_quality, calculate_cognitive_complexity, calculate_nesting_depth
 from .scoring import calculate_readability_score, config
 
 def analyze_code(code, language, user_config=None):
@@ -18,7 +18,8 @@ def analyze_code(code, language, user_config=None):
     #Complex form AST
     duplication_percentage, duplicated_blocks_info = calculate_duplication_ast(code)
     naming_metrics = calculate_naming_quality(code)
-    
+    nesting_metrics = calculate_nesting_depth(code)
+    cognitive_complexity = calculate_cognitive_complexity(code)
     readability = calculate_readability_score(lines, complexity, maintainability)
     
     return {
@@ -35,5 +36,8 @@ def analyze_code(code, language, user_config=None):
         'avg_name_length': naming_metrics['avg_name_length'],
         'single_letter_warnings': naming_metrics['single_letter_warnings'],
         'unclear_name_flags': naming_metrics['unclear_name_flags'],
-        'sorted_name_lengths' : naming_metrics['sorted_name_lengths']
+        'sorted_name_lengths' : naming_metrics['sorted_name_lengths'],
+        'max_nesting_depth': nesting_metrics['max_depth'],
+        'avg_nesting_depth': nesting_metrics['avg_depth'],
+        'cognitive_complexity': cognitive_complexity
     }

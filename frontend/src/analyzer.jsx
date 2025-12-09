@@ -56,7 +56,7 @@ function CodeAnalyzer() {
     <div className="analyzer-container">
       <header className="header">
         <div className="header-content">
-          <h1 className="title">Code Readability Analyzer</h1>
+          <h1 className="title"></h1>
           <p className="subtitle">Quantify your code's maintainability and clarity</p>
         </div>
       </header>
@@ -152,8 +152,9 @@ function CodeAnalyzer() {
                 <div className="metric-value">{results.avg_name_length || 'N/A'}</div>
                 <div className="metric-description">Documentation coverage</div>
               </div>
+              
 
-             <div className="metric-card">
+             <div className="metric-card" style={{ gridColumn: 'span 2' }}>
   <div className="metric-label">Variable Name Lengths</div>
   <div className="metric-description">Distribution of name lengths</div>
   {results.sorted_name_lengths && results.sorted_name_lengths.length > 0 ? (
@@ -161,18 +162,22 @@ function CodeAnalyzer() {
       <div style={{ 
         display: 'flex', 
         alignItems: 'flex-end', 
-        gap: '2px', 
-        height: '60px',
-        marginTop: '10px'
+        gap: '3px', 
+        height: '80px',
+        marginTop: '15px',
+        overflow: 'hidden',
+        padding: '0 10px' 
       }}>
         {results.sorted_name_lengths.map((length, idx) => (
           <div
             key={idx}
             style={{
-              width: '4px',
+              width: '6px', 
               height: `${(length / Math.max(...results.sorted_name_lengths)) * 100}%`,
               backgroundColor: length === 1 ? '#ff6b6b' : '#4ecdc4',
-              minHeight: '2px'
+              minHeight: '4px',
+              flexShrink: 0,
+              borderRadius: '2px 2px 0 0' 
             }}
             title={`Length: ${length}`}
           />
@@ -181,9 +186,10 @@ function CodeAnalyzer() {
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
-        marginTop: '5px',
-        fontSize: '12px',
-        color: '#666'
+        marginTop: '10px',
+        fontSize: '13px',
+        color: '#666',
+        fontWeight: '500'
       }}>
         <span>Min: {Math.min(...results.sorted_name_lengths)}</span>
         <span>Max: {Math.max(...results.sorted_name_lengths)}</span>
@@ -192,6 +198,24 @@ function CodeAnalyzer() {
   ) : (
     <div style={{ marginTop: '10px', color: '#999' }}>No data</div>
   )}
+</div>
+
+<div className="metric-card">
+  <div className="metric-label">Max Nesting Depth</div>
+  <div className="metric-value">{results.max_nesting_depth || 'N/A'}</div>
+  <div className="metric-description">Deepest code nesting level</div>
+</div>
+
+<div className="metric-card">
+  <div className="metric-label">Avg Nesting Depth</div>
+  <div className="metric-value">{results.avg_nesting_depth || 'N/A'}</div>
+  <div className="metric-description">Average nesting level</div>
+</div>
+
+<div className="metric-card">
+  <div className="metric-label">Cognitive Complexity</div>
+  <div className="metric-value">{results.cognitive_complexity || 'N/A'}</div>
+  <div className="metric-description">Difficulty to understand</div>
 </div>
             </div>
             {results.suggestions && results.suggestions.length > 0 && (

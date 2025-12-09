@@ -78,10 +78,18 @@ body {
 /* Main Content */
 .main-content {
   flex: 1;
-  max-width: 1200px;
   width: 100%;
-  margin: 0 auto;
   padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.left-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 /* Input Section */
@@ -90,7 +98,6 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 2rem;
   box-shadow: var(--shadow-sm);
 }
 
@@ -190,6 +197,7 @@ body {
   color: var(--color-error);
   font-size: 0.875rem;
   margin-bottom: 2rem;
+  grid-column: 1 / -1;
 }
 
 .error-icon {
@@ -198,6 +206,9 @@ body {
 
 /* Results Section */
 .results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   animation: fadeIn 0.5s ease;
 }
 
@@ -218,7 +229,6 @@ body {
   border-radius: 12px;
   padding: 3rem;
   text-align: center;
-  margin-bottom: 2rem;
   box-shadow: var(--shadow-lg);
 }
 
@@ -261,9 +271,8 @@ body {
 /* Metrics Grid */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .metric-card {
@@ -272,6 +281,9 @@ body {
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.2s ease;
+  min-height: 200px; 
+  display: flex;
+  flex-direction: column; 
 }
 
 .metric-card:hover {
@@ -362,6 +374,26 @@ body {
 }
 
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .main-content {
+    grid-template-columns: 1fr 1.5fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .title {
     font-size: 2rem;

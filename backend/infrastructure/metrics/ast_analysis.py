@@ -121,4 +121,71 @@ def calculate_naming_quality(code):
         'sorted_name_lengths': sorted(visitor.name_lengths)
     }
 
+class NestingDepthVisitor(ast.NodeVisitor):
+    NESTING_NODES = (ast.If, ast.For, ast.While, ast.With, ast.Try, 
+                     ast.ExceptHandler, ast.FunctionDef, ast.AsyncFor, ast.AsyncWith)
+    
+    def __init__(self):
+        self.max_depth = 0
+        self.current_depth = 0
+        self.depth_counts = []
+    
+    def visit(self, node):
+        if isinstance(node, self.NESTING_NODES):
+            self.current_depth += 1
+            self.max_depth = max(self.max_depth, self.current_depth)
+            self.depth_counts.append(self.current_depth)
+            self.generic_visit(node)
+            self.current_depth -= 1
+        else:
+            self.generic_visit(node)
+
+def calculate_nesting_depth(code):
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return {'max_depth': 0, 'avg_depth': 0.0}
+    
+    visitor = NestingDepthVisitor()
+    visitor.visit(tree)
+    
+    avg_depth = sum(visitor.depth_counts) / len(visitor.depth_counts) if visitor.depth_counts else 0.0
+    
+    return {
+        'max_depth': visitor.max_depth,
+        'avg_depth': round(avg_depth, 2)
+    }
+
+
+class CognitiveComplexityVisitor(ast.NodeVisitor):
+    NESTING_NODES = (ast.If, ast.For, ast.While, ast.Try)
+    
+    def __init__(self):
+        self.complexity = 0
+        self.nesting_level = 0
+    
+    def visit(self, node):
+        if isinstance(node, self.NESTING_NODES):
+            self.complexity += 1 + self.nesting_level
+            self.nesting_level += 1
+            self.generic_visit(node)
+            self.nesting_level -= 1
+        elif isinstance(node, (ast.ExceptHandler, ast.Lambda, ast.ListComp, ast.DictComp)):
+            self.complexity += 1 + self.nesting_level
+            self.generic_visit(node)
+        elif isinstance(node, ast.BoolOp):
+            self.complexity += len(node.values) - 1 + self.nesting_level
+            self.generic_visit(node)
+        else:
+            self.generic_visit(node)
+
+def calculate_cognitive_complexity(code):
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return 0
+    
+    visitor = CognitiveComplexityVisitor()
+    visitor.visit(tree)
+    return visitor.complexity
 
