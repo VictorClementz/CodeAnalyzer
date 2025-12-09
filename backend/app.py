@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 from models import db
 from routes.analyze import analyze_bp
 from routes.auth import auth_bp 
@@ -26,12 +26,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
+db.init_app(app)
+migrate = Migrate(app, db)
+
 with app.app_context():
-        try:
-            from flask_migrate import upgrade
-            upgrade()
-        except Exception as e:
-            print("Migration failed:", e)
+    try:
+        upgrade()
+    except Exception as e:
+        print("Migration failed:", e)
 
 # Register blueprints
 app.register_blueprint(analyze_bp)
