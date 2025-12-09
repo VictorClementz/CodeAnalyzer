@@ -26,9 +26,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-# Initialize extensions
-db.init_app(app)
-migrate = Migrate(app, db)
+with app.app_context():
+        try:
+            from flask_migrate import upgrade
+            upgrade()
+        except Exception as e:
+            print("Migration failed:", e)
 
 # Register blueprints
 app.register_blueprint(analyze_bp)
