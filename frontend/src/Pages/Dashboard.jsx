@@ -18,6 +18,7 @@ function Dashboard() {
       const response = await fetchWithAuth('/projects');
       if (!response.ok) throw new Error('Failed to load projects');
       const data = await response.json();
+      console.log('Project data:', data);
       setProjects(data);
     } catch (err) {
       setError(err.message);

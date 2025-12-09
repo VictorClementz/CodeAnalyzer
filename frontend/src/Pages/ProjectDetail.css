@@ -136,3 +136,173 @@
   color: #a3a3a3;
   font-family: 'IBM Plex Mono', monospace;
 }
+
+.header-actions {
+  margin: 1rem 0;
+}
+
+.git-button {
+  padding: 0.75rem 1.5rem;
+  background: #6c5ce7;
+  color: white;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.git-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border: 3px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.git-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.875rem;
+}
+
+.git-input:focus {
+  outline: none;
+  border-color: #6c5ce7;
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #737373;
+  font-size: 0.75rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.cancel-button,
+.link-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.cancel-button {
+  background: white;
+  color: #1a1a1a;
+}
+
+.link-button {
+  background: #6c5ce7;
+  color: white;
+}
+
+.cancel-button:hover,
+.link-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.scan-button {
+  padding: 0.75rem 1.5rem;
+  background: #00d9ff;
+  color: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.scan-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.scan-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scan-result {
+  background: #e8f9ff;
+  border: 2px solid #00d9ff;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.scan-result details {
+  margin-top: 0.5rem;
+}
+
+.scan-result ul {
+  margin: 0.5rem 0 0 1.5rem;
+  font-size: 0.875rem;
+  color: #d9534f;
+}

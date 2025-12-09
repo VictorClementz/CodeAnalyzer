@@ -72,7 +72,11 @@ def analyze(current_user):
             file.total_analyses += 1
             
             #Get git 
-            git_info = get_git_info()
+            git_info = None
+            if hasattr(project, 'git_repo_path') and project.git_repo_path:
+                git_info = get_git_info(project.git_repo_path)
+            else:
+                git_info = get_git_info()
             
             #Create analysis record
             analysis = FileAnalysis(

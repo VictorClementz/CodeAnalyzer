@@ -1,46 +1,124 @@
 import subprocess
 import hashlib
-from pathlib import Path
+import os
 
-def get_git_info(file_path=None):
-  
+def get_git_info(repo_path=None):
     try:
-        #Get commit hash
-        commit_hash = subprocess.check_output(
-            ['git', 'rev-parse', 'HEAD'],
-            stderr=subprocess.DEVNULL
-        ).decode().strip()
+        original_dir = os.getcwd()
         
-        #Get branch name
-        branch = subprocess.check_output(
-            ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-            stderr=subprocess.DEVNULL
-        ).decode().strip()
+        if repo_path:
+            os.chdir(repo_path)
         
-        #Get commit message
-        commit_message = subprocess.check_output(
-            ['git', 'log', '-1', '--pretty=%B'],
-            stderr=subprocess.DEVNULL
-        ).decode().strip()
+        # Check if it's a git repository
+        subprocess.run(['git', 'rev-parse', '--git-dir'], 
+                      check=True, 
+                      capture_output=True, 
+                      text=True)
+        
+        # Get commit hash
+        commit_hash = subprocess.run(['git', 'rev-parse', 'HEAD'], 
+                                    capture_output=True, 
+                                    text=True, 
+                                    check=True).stdout.strip()
+        
+        # Get branch name
+        branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], 
+                               capture_output=True, 
+                               text=True, 
+                               check=True).stdout.strip()
+        
+        # Get commit message
+        commit_message = subprocess.run(['git', 'log', '-1', '--pretty=%B'], 
+                                       capture_output=True, 
+                                       text=True, 
+                                       check=True).stdout.strip()
+        
+        if repo_path:
+            os.chdir(original_dir)
         
         return {
             'commit_hash': commit_hash,
             'branch': branch,
             'commit_message': commit_message
         }
+    
     except (subprocess.CalledProcessError, FileNotFoundError):
-        # Not a git repo or git not installed
+        if repo_path and os.getcwd() != original_dir:
+            os.chdir(original_dir)
         return None
 
 def get_code_hash(code):
     return hashlib.sha256(code.encode()).hexdigest()
 
-def is_git_repo():
+def validate_git_repo(repo_path):
+    """Check if a path is a valid git repository"""
+    if not os.path.exists(repo_path):
+        return False, "Path does not exist"
+    
     try:
-        subprocess.check_output(
-            ['git', 'rev-parse', '--git-dir'],
-            stderr=subprocess.DEVNULL
-        )
-        return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return False
+        result = subprocess.run(['git', '-C', repo_path, 'rev-parse', '--git-dir'],
+                              capture_output=True,
+                              text=True,
+                              timeout=5)
+        if result.returncode == 0:
+            return True, "Valid git repository"  # Added missing message
+        else:
+            return False, "Not a git repository"  # Added missing message
+    except Exception as e:
+        return False, str(e)
+    
+def scan_repo_files(repo_path, language='python'):
+    """
+    Scan a git repository for code files
+    
+    Args:
+        repo_path: Path to git repository
+        language: Programming language to scan for ('python', 'javascript')
+    
+    Returns:
+        List of tuples: [(relative_path, file_content), ...]
+    """
+    if not os.path.exists(repo_path):
+        return []
+    
+    # File extensions by language
+    extensions = {
+        'python': ['.py'],
+        'javascript': ['.js', '.jsx'],
+        'java': ['.java'],
+        'cpp': ['.cpp', '.cc', '.cxx', '.h', '.hpp']
+    }
+    
+    valid_extensions = extensions.get(language, ['.py'])
+    
+    # Directories to skip
+    skip_dirs = {
+        '.git', '__pycache__', 'node_modules', 'venv', 'env',
+        '.venv', 'build', 'dist', '.pytest_cache', '.mypy_cache',
+        'eggs', '.eggs', '*.egg-info'
+    }
+    
+    files_found = []
+    
+    for root, dirs, files in os.walk(repo_path):
+        # Skip ignored directories
+        dirs[:] = [d for d in dirs if d not in skip_dirs]
+        
+        # Get relative path from repo root
+        rel_root = os.path.relpath(root, repo_path)
+        
+        for file in files:
+            # Check if file has valid extension
+            if any(file.endswith(ext) for ext in valid_extensions):
+                file_path = os.path.join(root, file)
+                rel_path = os.path.join(rel_root, file) if rel_root != '.' else file
+                
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        files_found.append((rel_path, content))
+                except Exception as e:
+                    print(f"Error reading {file_path}: {e}")
+                    continue
+    
+    return files_found

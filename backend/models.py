@@ -36,6 +36,10 @@ class Project(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    git_repo_path = db.Column(db.String(500)) 
+    git_remote_url = db.Column(db.String(500)) 
+    auto_detect_git = db.Column(db.Boolean, default=True)
     
     files = db.relationship('ProjectFile', backref='project', lazy=True, cascade='all, delete-orphan')
 
@@ -44,7 +48,10 @@ class Project(db.Model):
             'id': self.id,
             'name': self.name,
             'created_at': self.created_at.isoformat(),
-            'file_count': len(self.files)
+            'file_count': len(self.files),
+            'git_repo_path': self.git_repo_path,
+            'git_remote_url': self.git_remote_url,
+            'auto_detect_git': self.auto_detect_git
         }
 
 class ProjectFile(db.Model):
