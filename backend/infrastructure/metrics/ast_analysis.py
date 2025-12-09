@@ -57,10 +57,12 @@ class VariableNameVisitor(ast.NodeVisitor):
         self.all_names = []
         self.single_letter_warnings = []
         self.unclear_names = []
+        self.name_lengths = []
 
     def visit_Name(self, node):
         name = node.id
         self.all_names.append(name)
+        self.name_lengths.append(len(name))
         
         # Flag single-letter variables unless they are common loop indices
         if len(name) == 1 and name not in ('i', 'j', 'k', 'n', 'e', 'x', 'y'):
@@ -115,5 +117,8 @@ def calculate_naming_quality(code):
     return {
         'avg_name_length': round(avg_length, 2),
         'single_letter_warnings': list(set(visitor.single_letter_warnings)),
-        'unclear_name_flags': list(set(unclear_flags))
+        'unclear_name_flags': list(set(unclear_flags)),
+        'sorted_name_lengths': sorted(visitor.name_lengths)
     }
+
+

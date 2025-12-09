@@ -34,5 +34,6 @@ def analyze_code(code, language, user_config=None):
         'duplicated_blocks_info': duplicated_blocks_info,
         'avg_name_length': naming_metrics['avg_name_length'],
         'single_letter_warnings': naming_metrics['single_letter_warnings'],
-        'unclear_name_flags': naming_metrics['unclear_name_flags']
+        'unclear_name_flags': naming_metrics['unclear_name_flags'],
+        'sorted_name_lengths' : naming_metrics['sorted_name_lengths']
     }

@@ -152,14 +152,48 @@ function CodeAnalyzer() {
                 <div className="metric-value">{results.avg_name_length || 'N/A'}</div>
                 <div className="metric-description">Documentation coverage</div>
               </div>
+
+             <div className="metric-card">
+  <div className="metric-label">Variable Name Lengths</div>
+  <div className="metric-description">Distribution of name lengths</div>
+  {results.sorted_name_lengths && results.sorted_name_lengths.length > 0 ? (
+    <>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'flex-end', 
+        gap: '2px', 
+        height: '60px',
+        marginTop: '10px'
+      }}>
+        {results.sorted_name_lengths.map((length, idx) => (
+          <div
+            key={idx}
+            style={{
+              width: '4px',
+              height: `${(length / Math.max(...results.sorted_name_lengths)) * 100}%`,
+              backgroundColor: length === 1 ? '#ff6b6b' : '#4ecdc4',
+              minHeight: '2px'
+            }}
+            title={`Length: ${length}`}
+          />
+        ))}
+      </div>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        marginTop: '5px',
+        fontSize: '12px',
+        color: '#666'
+      }}>
+        <span>Min: {Math.min(...results.sorted_name_lengths)}</span>
+        <span>Max: {Math.max(...results.sorted_name_lengths)}</span>
+      </div>
+    </>
+  ) : (
+    <div style={{ marginTop: '10px', color: '#999' }}>No data</div>
+  )}
+</div>
             </div>
-
-            
-            
-
-
-            
-
             {results.suggestions && results.suggestions.length > 0 && (
               <div className="suggestions-section">
                 <h3 className="suggestions-title">Suggestions for Improvement</h3>
