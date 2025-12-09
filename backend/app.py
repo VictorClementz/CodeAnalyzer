@@ -13,7 +13,10 @@ load_dotenv()
 app = Flask(__name__)
 CORS(
     app,
-    resources={r"/*": {"origins": "http://localhost:5173"}},
+    resources={r"/*": {"origins": [
+        "http://localhost:5173",
+        "https://codeanalyzer-f1xp.onrender.com"
+    ]}},
     supports_credentials=True,
     allow_headers=["Content-Type", "Authorization", "X-Requested-With"],
     expose_headers=["Content-Type", "Authorization"],
