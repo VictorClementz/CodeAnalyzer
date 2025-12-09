@@ -20,7 +20,18 @@ def analyze_code(code, language, user_config=None):
     naming_metrics = calculate_naming_quality(code)
     nesting_metrics = calculate_nesting_depth(code)
     cognitive_complexity = calculate_cognitive_complexity(code)
-    readability = calculate_readability_score(lines, complexity, maintainability)
+
+    #Readability
+    readability = calculate_readability_score(
+    lines, 
+    complexity, 
+    maintainability,
+    cognitive_complexity,
+    nesting_metrics['max_depth'],
+    nesting_metrics['avg_depth'],
+    comment_density,
+    naming_metrics['avg_name_length']
+)
     
     return {
         'lines_of_code': lines,
