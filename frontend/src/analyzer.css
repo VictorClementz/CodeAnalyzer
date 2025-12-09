@@ -418,4 +418,34 @@ body {
   .main-content {
     padding: 2rem 1rem;
   }
+
+  .code-input-wrapper {
+  position: relative;
+}
+
+.code-input-wrapper.dragging {
+  border: 2px dashed var(--color-accent);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.drag-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(37, 99, 235, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.drag-message {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
 }
