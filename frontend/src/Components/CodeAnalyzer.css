@@ -517,4 +517,71 @@ body {
   .main-content {
     padding: 2rem 1rem;
   }
+
+  
+}
+
+.save-options {
+  padding: 1.5rem;
+  border-bottom: 3px solid #1a1a1a;
+  background: #fffef7;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.project-selection {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.project-select,
+.project-input,
+.filename-input {
+  padding: 0.75rem;
+  border: 2px solid #1a1a1a;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  background: var(--color-surface);
+  font-weight: 500;
+}
+
+.project-select:focus,
+.project-input:focus,
+.filename-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.saved-indicator {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 217, 255, 0.2);
+  border: 2px solid #00d9ff;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: white;
 }

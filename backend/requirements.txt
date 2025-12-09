@@ -2,3 +2,10 @@ flask==3.0.0
 flask-cors==4.0.0
 radon==6.0.1
 gunicorn
+flask-sqlalchemy
+flask-migrate
+psycopg2-binary
+flask-login
+python-dotenv
+pyjwt
+werkzeug
