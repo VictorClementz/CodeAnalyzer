@@ -41,6 +41,8 @@ def token_required(f):
 
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
 def signup():
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
     data = request.json
     
     email = data.get('email')
