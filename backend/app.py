@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from models import db
 from routes.analyze import analyze_bp
 from routes.auth import auth_bp 
+from routes.projects import projects_bp
 import os
 from dotenv import load_dotenv
 
@@ -32,6 +33,7 @@ migrate = Migrate(app, db)
 # Register blueprints
 app.register_blueprint(analyze_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(projects_bp)
 
 @app.route('/')
 def health_check():

@@ -7,11 +7,7 @@ from datetime import datetime
 
 analyze_bp = Blueprint('analyze', __name__)
 
-@analyze_bp.route('/projects', methods=['GET', 'OPTIONS'])
-@token_required
-def get_projects(current_user):
-    projects = Project.query.filter_by(user_id=current_user.id).all()
-    return jsonify([p.to_dict() for p in projects])
+
 
 
 @analyze_bp.route('/analyze', methods=['POST'])

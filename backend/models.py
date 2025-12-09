@@ -21,6 +21,14 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'created_at': self.created_at.isoformat()
+        }
+
 class Project(db.Model):
     __tablename__ = 'projects'
     
@@ -30,6 +38,14 @@ class Project(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     files = db.relationship('ProjectFile', backref='project', lazy=True, cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at.isoformat(),
+            'file_count': len(self.files)
+        }
 
 class ProjectFile(db.Model):
     __tablename__ = 'project_files'
@@ -43,6 +59,16 @@ class ProjectFile(db.Model):
     total_analyses = db.Column(db.Integer, default=0)
     
     analyses = db.relationship('FileAnalysis', backref='file', lazy=True, cascade='all, delete-orphan')
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'filename': self.filename,
+            'language': self.language,
+            'current_score': self.current_score,
+            'last_analyzed': self.last_analyzed.isoformat() if self.last_analyzed else None,
+            'total_analyses': self.total_analyses,
+            'project_id': self.project_id
+        }
 
 class FileAnalysis(db.Model):
     __tablename__ = 'file_analyses'
@@ -70,3 +96,24 @@ class FileAnalysis(db.Model):
     cognitive_complexity = db.Column(db.Integer)
     avg_function_length = db.Column(db.Float)
     max_function_length = db.Column(db.Integer)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'timestamp': self.timestamp.isoformat(),
+            'commit_hash': self.commit_hash,
+            'commit_message': self.commit_message,
+            'branch': self.branch,
+            'readability_score': self.readability_score,
+            'cyclomatic_complexity': self.cyclomatic_complexity,
+            'maintainability_index': self.maintainability_index,
+            'lines_of_code': self.lines_of_code,
+            'comment_density': self.comment_density,
+            'duplication_percentage': self.duplication_percentage,
+            'avg_name_length': self.avg_name_length,
+            'max_nesting_depth': self.max_nesting_depth,
+            'avg_nesting_depth': self.avg_nesting_depth,
+            'cognitive_complexity': self.cognitive_complexity,
+            'avg_function_length': self.avg_function_length,
+            'max_function_length': self.max_function_length
+        }

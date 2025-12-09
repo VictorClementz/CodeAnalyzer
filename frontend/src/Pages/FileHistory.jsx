@@ -32,7 +32,7 @@ function FileHistory() {
   if (!data) return <div className="error-message">No data found</div>;
 
   // Prepare chart data (reverse to show oldest first)
-  const chartData = [...data.analyses].reverse().map(a => ({
+  const chartData = [...data.history].reverse().map(a => ({
     date: new Date(a.timestamp).toLocaleDateString(),
     score: a.readability_score,
     complexity: a.cyclomatic_complexity,
@@ -49,7 +49,7 @@ function FileHistory() {
         <span className="file-language-badge">{data.file.language}</span>
       </header>
 
-      {data.analyses.length === 0 ? (
+     {data.history.length === 0 ? (
         <p>No analysis history yet</p>
       ) : (
         <>
@@ -115,7 +115,7 @@ function FileHistory() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.analyses.map(analysis => (
+                  {data.history.map(analysis => (
                     <tr key={analysis.id}>
                       <td>{new Date(analysis.timestamp).toLocaleString()}</td>
                       <td>
