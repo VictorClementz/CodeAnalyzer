@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './CodeAnalyzer.css';
 import { fetchWithAuth } from '../utils/Auth';
 import { authService } from '../utils/Auth'
@@ -16,6 +16,35 @@ function CodeAnalyzer() {
   const [mode, setMode] = useState('single');
   const [isDragging, setIsDragging] = useState(false);
 
+  // Project saving state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [saveToProject, setSaveToProject] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState('');
+  const [newProjectName, setNewProjectName] = useState('');
+  const [filename, setFilename] = useState('');
+
+  useEffect(() => {
+    const loggedIn = authService.isAuthenticated();
+    setIsLoggedIn(loggedIn);
+    
+    if (loggedIn) {
+      loadProjects();
+    }
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      const response = await fetchWithAuth('/projects');
+      if (response.ok) {
+        const data = await response.json();
+        setProjects(data);
+      }
+    } catch (err) {
+      console.error('Failed to load projects:', err);
+    }
+  };
+
   const analyzeCode = async () => {
     if (!code.trim()) {
       setError('Please paste some code to analyze');
@@ -28,6 +57,9 @@ function CodeAnalyzer() {
     setBatchResults(null);
 
     try {
+      const projectName = selectedProject === 'new' ? newProjectName : 
+                         selectedProject || null;
+
       const response = await fetchWithAuth('/analyze', {
         method: 'POST',
         headers: {
@@ -35,7 +67,10 @@ function CodeAnalyzer() {
         },
         body: JSON.stringify({
           code: code,
-          language: language
+          language: language,
+          save_results: isLoggedIn && saveToProject,
+          project_name: saveToProject ? projectName : null,
+          filename: saveToProject && filename ? filename : `untitled.${language === 'python' ? 'py' : 'js'}`
         }),
       });
 
@@ -46,6 +81,10 @@ function CodeAnalyzer() {
       const data = await response.json();
       setResults(data);
       setMode('single');
+      
+      if (data.saved) {
+        loadProjects();
+      }
     } catch (err) {
       setError('Failed to analyze code. Make sure the backend server is running on port 5002.');
     } finally {
@@ -67,6 +106,14 @@ function CodeAnalyzer() {
     const formData = new FormData();
     Array.from(files).forEach(file => formData.append('files', file));
     formData.append('language', language);
+    
+    // Add project name if saving
+    if (saveToProject) {
+      const projectName = selectedProject === 'new' ? newProjectName : selectedProject;
+      if (projectName) {
+        formData.append('project_name', projectName);
+      }
+    }
 
     try {
       const token = authService.getToken()
@@ -85,6 +132,10 @@ function CodeAnalyzer() {
       const data = await response.json();
       setBatchResults(data);
       setMode('batch');
+      
+      if (saveToProject) {
+        loadProjects();
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -174,6 +225,55 @@ function CodeAnalyzer() {
               </label>
             </div>
 
+            {isLoggedIn && (
+              <div className="save-options">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={saveToProject}
+                    onChange={(e) => setSaveToProject(e.target.checked)}
+                  />
+                  <span>Save to project</span>
+                </label>
+
+                {saveToProject && (
+                  <div className="project-selection">
+                    <select
+                      value={selectedProject}
+                      onChange={(e) => setSelectedProject(e.target.value)}
+                      className="project-select"
+                    >
+                      <option value="">Default Project</option>
+                      {projects.map(p => (
+                        <option key={p.id} value={p.name}>{p.name}</option>
+                      ))}
+                      <option value="new">+ Create new project</option>
+                    </select>
+
+                    {selectedProject === 'new' && (
+                      <input
+                        type="text"
+                        value={newProjectName}
+                        onChange={(e) => setNewProjectName(e.target.value)}
+                        placeholder="New project name"
+                        className="project-input"
+                      />
+                    )}
+
+                    {mode === 'single' && (
+                      <input
+                        type="text"
+                        value={filename}
+                        onChange={(e) => setFilename(e.target.value)}
+                        placeholder={`Filename (e.g., main.${language === 'python' ? 'py' : 'js'})`}
+                        className="filename-input"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div
               className={`code-input-wrapper ${isDragging ? 'dragging' : ''}`}
               onDragEnter={handleDragEnter}
@@ -218,6 +318,9 @@ function CodeAnalyzer() {
                   </>
                 )}
               </div>
+              {results?.saved && (
+                <div className="saved-indicator">✓ Saved to project</div>
+              )}
             </div>
           )}
         </div>
@@ -240,7 +343,7 @@ function CodeAnalyzer() {
 
               <div className="metric-card">
                 <div className="metric-label">Maintainability Index</div>
-                <div className="metric-value">{results.maintainability_index || 'N/A'}</div>
+                <div className="metric-value">{results.maintainability_index ? results.maintainability_index.toFixed(1) : 'N/A'}</div>
                 <div className="metric-description">Industry standard metric</div>
               </div>
 
@@ -346,69 +449,69 @@ function CodeAnalyzer() {
           </div>
         )}
 
-       {mode === 'batch' && batchResults && (
-  <div className="results-section">
-    <div className="metrics-grid">
-      <div className="metric-card">
-        <div className="metric-label">Total Files</div>
-        <div className="metric-value">{batchResults.total_files}</div>
-        <div className="metric-description">Files analyzed</div>
-      </div>
+        {mode === 'batch' && batchResults && (
+          <div className="results-section">
+            <div className="metrics-grid">
+              <div className="metric-card">
+                <div className="metric-label">Total Files</div>
+                <div className="metric-value">{batchResults.total_files}</div>
+                <div className="metric-description">Files analyzed</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Total Lines</div>
-        <div className="metric-value">{batchResults.total_lines}</div>
-        <div className="metric-description">Total project lines</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Total Lines</div>
+                <div className="metric-value">{batchResults.total_lines}</div>
+                <div className="metric-description">Total project lines</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Complexity</div>
-        <div className="metric-value">{batchResults.avg_complexity}</div>
-        <div className="metric-description">Cyclomatic complexity</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Complexity</div>
+                <div className="metric-value">{batchResults.avg_complexity}</div>
+                <div className="metric-description">Cyclomatic complexity</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Maintainability</div>
-        <div className="metric-value">{batchResults.avg_maintainability}</div>
-        <div className="metric-description">Maintainability index</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Maintainability</div>
+                <div className="metric-value">{batchResults.avg_maintainability}</div>
+                <div className="metric-description">Maintainability index</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Comment Density</div>
-        <div className="metric-value">{batchResults.avg_comment_density}%</div>
-        <div className="metric-description">Documentation coverage</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Comment Density</div>
+                <div className="metric-value">{batchResults.avg_comment_density}%</div>
+                <div className="metric-description">Documentation coverage</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Duplication</div>
-        <div className="metric-value">{batchResults.avg_duplication}%</div>
-        <div className="metric-description">Code duplication</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Duplication</div>
+                <div className="metric-value">{batchResults.avg_duplication}%</div>
+                <div className="metric-description">Code duplication</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Variable Length</div>
-        <div className="metric-value">{batchResults.avg_name_length}</div>
-        <div className="metric-description">Variable naming</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Variable Length</div>
+                <div className="metric-value">{batchResults.avg_name_length}</div>
+                <div className="metric-description">Variable naming</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Max Nesting Depth</div>
-        <div className="metric-value">{batchResults.max_nesting_depth}</div>
-        <div className="metric-description">Deepest nesting in project</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Max Nesting Depth</div>
+                <div className="metric-value">{batchResults.max_nesting_depth}</div>
+                <div className="metric-description">Deepest nesting in project</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Nesting Depth</div>
-        <div className="metric-value">{batchResults.avg_nesting_depth}</div>
-        <div className="metric-description">Average nesting level</div>
-      </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Nesting Depth</div>
+                <div className="metric-value">{batchResults.avg_nesting_depth}</div>
+                <div className="metric-description">Average nesting level</div>
+              </div>
 
-      <div className="metric-card">
-        <div className="metric-label">Avg Cognitive Complexity</div>
-        <div className="metric-value">{batchResults.avg_cognitive_complexity}</div>
-        <div className="metric-description">Understanding difficulty</div>
-      </div>
-    </div>
+              <div className="metric-card">
+                <div className="metric-label">Avg Cognitive Complexity</div>
+                <div className="metric-value">{batchResults.avg_cognitive_complexity}</div>
+                <div className="metric-description">Understanding difficulty</div>
+              </div>
+            </div>
 
             <div className="suggestions-section">
               <h3 className="suggestions-title">File Analysis Results</h3>

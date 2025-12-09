@@ -117,7 +117,7 @@ def analyze_batch(current_user):
     language = request.form.get('language', 'python')
     project_name = request.form.get('project_name', 'Batch Upload')
     
-    #Get or create project
+    # Get or create project
     project = Project.query.filter_by(
         user_id=current_user.id,
         name=project_name
@@ -133,7 +133,7 @@ def analyze_batch(current_user):
     for file in files:
         filename = file.filename
         
-        #Filter by language
+        # Filter by language
         if language == 'python' and not filename.endswith('.py'):
             continue
         elif language == 'javascript' and not filename.endswith('.js'):
@@ -143,7 +143,7 @@ def analyze_batch(current_user):
             code = file.read().decode('utf-8')
             analysis_results = analyze_code(code, language)
             
-            #Save to database
+            # Save to database
             project_file = ProjectFile.query.filter_by(
                 project_id=project.id,
                 filename=filename
@@ -158,15 +158,15 @@ def analyze_batch(current_user):
                 db.session.add(project_file)
                 db.session.flush()
             
-            #Update file stats
+            # Update file stats
             project_file.current_score = analysis_results['readability_score']
             project_file.last_analyzed = datetime.utcnow()
             project_file.total_analyses += 1
             
-            #Get git info
+            # Get git info
             git_info = get_git_info()
             
-            #Create analysis record
+            # Create analysis record
             analysis = FileAnalysis(
                 file_id=project_file.id,
                 commit_hash=git_info['commit_hash'] if git_info else None,
@@ -202,7 +202,7 @@ def analyze_batch(current_user):
     
     db.session.commit()
     
-    #Calculate
+    # Calculate aggregates
     valid_results = [r for r in results if 'metrics' in r]
     
     if not valid_results:
@@ -212,6 +212,10 @@ def analyze_batch(current_user):
         values = [r['metrics'][key] for r in valid_results if r['metrics'].get(key) is not None]
         return round(sum(values) / len(values), 2) if values else 0
     
+    def safe_max(key):
+        values = [r['metrics'][key] for r in valid_results if r['metrics'].get(key) is not None]
+        return max(values) if values else 0
+    
     project_summary = {
         'project_id': project.id,
         'project_name': project.name,
@@ -220,6 +224,12 @@ def analyze_batch(current_user):
         'avg_complexity': safe_avg('cyclomatic_complexity'),
         'avg_maintainability': safe_avg('maintainability_index'),
         'total_lines': sum(r['metrics']['lines_of_code'] for r in valid_results),
+        'avg_comment_density': safe_avg('comment_density'),
+        'avg_duplication': safe_avg('duplication_percentage'),
+        'avg_name_length': safe_avg('avg_name_length'),
+        'max_nesting_depth': safe_max('max_nesting_depth'),
+        'avg_nesting_depth': safe_avg('avg_nesting_depth'),
+        'avg_cognitive_complexity': safe_avg('cognitive_complexity'),
         'files': results
     }
     
