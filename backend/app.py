@@ -1,17 +1,34 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
+from flask_migrate import Migrate
+from models import db
 from routes.analyze import analyze_bp
+from routes.auth import auth_bp 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
+
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///codeanalyzer.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# Initialize extensions
+db.init_app(app)
+migrate = Migrate(app, db)
+
+# Register blueprints
+app.register_blueprint(analyze_bp)
+app.register_blueprint(auth_bp)
 
 @app.route('/')
 def health_check():
-    return jsonify({'status': 'running', 'message': 'Code Analyzer API'})
-
-app.register_blueprint(analyze_bp)
+    return {'status': 'running', 'message': 'Code Analyzer API'}
 
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5002))
     app.run(host='0.0.0.0', debug=False, port=port)
