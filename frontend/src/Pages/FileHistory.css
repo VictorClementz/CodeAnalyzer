@@ -1,0 +1,110 @@
+.file-history-container {
+  min-height: calc(100vh - 80px);
+  padding: 3rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.file-history-header {
+  margin-bottom: 3rem;
+}
+
+.file-history-header h1 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.file-language-badge {
+  background: #a29bfe;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+  border: 2px solid #1a1a1a;
+}
+
+.chart-section {
+  background: white;
+  border: 3px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.chart-section h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+}
+
+.history-table {
+  background: white;
+  border: 3px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.history-table h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.875rem;
+}
+
+thead {
+  background: #fffef7;
+  border-bottom: 2px solid #1a1a1a;
+}
+
+th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: #525252;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+tr:hover {
+  background: #fffef7;
+}
+
+code {
+  background: #1a1a1a;
+  color: #00d9ff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.score-excellent { color: #00d9ff; font-weight: 700; }
+.score-good { color: #6c5ce7; font-weight: 700; }
+.score-fair { color: #fdcb6e; font-weight: 700; }
+.score-poor { color: #ff6b35; font-weight: 700; }

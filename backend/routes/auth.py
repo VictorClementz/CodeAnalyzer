@@ -11,6 +11,8 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return jsonify({"ok": True}), 200
         token = request.headers.get('Authorization')
         
         if not token:
@@ -36,7 +38,7 @@ def token_required(f):
     
     return decorated
 
-@auth_bp.route('/signup', methods=['POST'])
+@auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
 def signup():
     data = request.json
     
@@ -74,8 +76,10 @@ def signup():
         }
     }), 201
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login():
+    if request.method == 'OPTIONS':
+        return '', 200 
     data = request.json
     
     email = data.get('email')

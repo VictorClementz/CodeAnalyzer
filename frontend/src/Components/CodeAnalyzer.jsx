@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import './analyzer.css';
+import './CodeAnalyzer.css';
+import { fetchWithAuth } from '../utils/Auth';
+import { authService } from '../utils/Auth'
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -25,7 +28,7 @@ function CodeAnalyzer() {
     setBatchResults(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      const response = await fetchWithAuth('/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,8 +69,12 @@ function CodeAnalyzer() {
     formData.append('language', language);
 
     try {
+      const token = authService.getToken()
       const response = await fetch(`${API_BASE_URL}/analyze-batch`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+       },
         body: formData,
       });
 
@@ -79,7 +86,7 @@ function CodeAnalyzer() {
       setBatchResults(data);
       setMode('batch');
     } catch (err) {
-      setError('Failed to analyze files. Make sure the backend server is running.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
