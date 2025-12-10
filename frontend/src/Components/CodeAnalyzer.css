@@ -92,6 +92,79 @@ body {
   font-family: var(--font-display);
 }
 
+.header-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative; /* Add this */
+}
+
+/* Add this new block */
+.git-promo-card {
+  position: absolute;
+  left: -500px;
+  top: -40px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 3px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 240px;
+  box-shadow: 
+    4px 4px 0 rgba(0, 0, 0, 0.2),
+    8px 8px 0 rgba(0, 0, 0, 0.1);
+  transform: rotate(-2deg);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: rotate(-2deg) translateY(0px);
+  }
+  50% {
+    transform: rotate(-2deg) translateY(-8px);
+  }
+}
+
+.git-promo-card:hover {
+  transform: rotate(-1deg) translateY(-4px) scale(1.05);
+  box-shadow: 
+    6px 6px 0 rgba(0, 0, 0, 0.2),
+    12px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.promo-icon {
+  font-size: 24px;
+}
+
+.promo-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.promo-status {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+
+.status-easy {
+  color: #000000;
+  font-weight: 600;
+}
+
+.status-secure {
+  color: #000000;
+  font-style: italic;
+  font-weight: 500;
+}
+
 /* Main Content */
 .main-content {
   flex: 1;

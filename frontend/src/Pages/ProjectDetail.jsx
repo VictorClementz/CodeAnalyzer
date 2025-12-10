@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/Auth';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './ProjectDetail.css';
+import { useNavigate } from 'react-router-dom';
 
 function ProjectDetail() {
   const { projectId } = useParams();
@@ -10,6 +11,8 @@ function ProjectDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
+   const [showConfirm, setConfirm] = useState(false);
+   const navigate = useNavigate();
   // Git modal state
   const [showGitModal, setShowGitModal] = useState(false);
   const [gitRepoPath, setGitRepoPath] = useState('');
@@ -91,6 +94,27 @@ function ProjectDetail() {
     }
   };
 
+  const DeleteProject = async () => {
+    try {
+      const response = await fetchWithAuth(`/projects/${projectId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+       alert(`Delete succesfull`);
+       navigate('/dashboard');
+      } else {
+        const data = await response.json();
+        alert(`Delete failed: ${data.error}`);
+      }
+    } catch (err) {
+      alert('Failed to delete project: ' + err.message);
+    } finally {
+    setConfirm(false);
+    }
+  };
+
+
   if (loading) return <div className="loading">Loading project...</div>;
   if (error) return <div className="error-message">{error}</div>;
   if (!project) return <div className="error-message">Project not found</div>;
@@ -107,7 +131,7 @@ function ProjectDetail() {
         
         <div className="header-actions">
           <button onClick={() => setShowGitModal(true)} className="git-button">
-            ⚙️ Link Git Repo
+            Link Git Repo
           </button>
           
           {project.project?.git_repo_path && (
@@ -116,11 +140,17 @@ function ProjectDetail() {
               disabled={scanning}
               className="scan-button"
             >
-              {scanning ? '🔄 Scanning...' : '📁 Scan Repository'}
+              {scanning ? 'Scanning...' : 'Scan Repository'}
             </button>
           )}
         </div>
+        <div className="header-actions">
+          <button onClick={() => setConfirm(true)} className="delete-button">
+            Delete Project
+          </button>
+        </div>
 
+          
         <div className="project-stats">
           <div className="stat-card">
             <div className="stat-label">Files</div>
@@ -230,6 +260,23 @@ function ProjectDetail() {
               </button>
               <button onClick={linkGitRepo} className="link-button">
                 Link Repository
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Git Modal */}
+      {showConfirm && (
+        <div className="modal-overlay" onClick={() => setConfirm(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Are you sure you want to delete the project?</h2>
+            <div className="modal-actions">
+              <button onClick={() => setConfirm(false)} className="cancel-button">
+                Cancel
+              </button>
+              <button onClick={DeleteProject} className="Confirm-Delete-button">
+                Delete
               </button>
             </div>
           </div>

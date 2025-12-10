@@ -13,12 +13,26 @@ def get_projects(current_user):
     projects = Project.query.filter_by(user_id=current_user.id).all()
     return jsonify([p.to_dict() for p in projects])
 
-@projects_bp.route('/projects/<int:project_id>', methods=['GET', 'OPTIONS'])
+
+
+@projects_bp.route('/projects/<int:project_id>', methods=['GET', 'OPTIONS','DELETE'])
 @token_required
 def get_project_detail(current_user, project_id):
     if request.method == "OPTIONS":
         return jsonify({"ok": True}), 200
-    
+    if request.method == 'DELETE':
+        project = Project.query.get_or_404(project_id)
+
+        if project.user_id != current_user.id:
+            return jsonify({'error': 'Unauthorized'}), 403
+        
+        db.session.delete(project)
+        db.session.commit()
+        return jsonify({'message': 'Project deleted successfully'}), 200
+           
+
+       
+
     project = Project.query.filter_by(
         id=project_id, 
         user_id=current_user.id
@@ -50,6 +64,7 @@ def get_file_history(current_user, project_id, file_id):
         'file': file.to_dict(),
         'history': [a.to_dict() for a in analyses]
     })
+
 
 @projects_bp.route('/projects/<int:project_id>/git', methods=['POST', 'OPTIONS'])
 @token_required

@@ -183,11 +183,21 @@ function CodeAnalyzer() {
   return (
     <div className="analyzer-container">
       <header className="header">
-        <div className="header-content">
-          <h1 className="title"></h1>
-          <p className="subtitle">Quantify your code's maintainability and clarity(only python rn)</p>
-        </div>
-      </header>
+  <div className="header-content">
+    <div className="git-promo-card">
+      <span className="promo-icon"></span>
+      <div className="promo-text">
+        <h3>Import from Git!</h3>
+        <p className="promo-status">
+          <span className="status-easy">Easy, yes.</span>
+          <span className="status-secure">Secure, ehmm...</span>
+        </p>
+      </div>
+    </div>
+    <h1 className="title"></h1>
+    <p className="subtitle">Quantify your code's maintainability and clarity(only python rn)</p>
+  </div>
+</header>
 
       <main className="main-content">
         <div className="left-section">
