@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import './CodeAnalyzer.css';
 import { fetchWithAuth } from '../utils/Auth';
 import { authService } from '../utils/Auth'
-
+import ProjectDetail from '../Pages/ProjectDetail';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,6 +16,8 @@ function CodeAnalyzer() {
   const [error, setError] = useState(null);
   const [mode, setMode] = useState('single');
   const [isDragging, setIsDragging] = useState(false);
+  const navigate = useNavigate();
+  
 
   // Project saving state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -180,11 +183,16 @@ function CodeAnalyzer() {
     return 'poor';
   };
 
+  const importGit  = () => {
+    
+    navigate('/dashboard?import=true');
+  }
+
   return (
     <div className="analyzer-container">
       <header className="header">
   <div className="header-content">
-    <div className="git-promo-card">
+    <div className="git-promo-card" onClick={() => importGit()}>
       <span className="promo-icon"></span>
       <div className="promo-text">
         <h3>Import from Git!</h3>

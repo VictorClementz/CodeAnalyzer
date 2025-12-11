@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { fetchWithAuth } from '../utils/Auth';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './Dashboard.css';
@@ -8,17 +8,27 @@ function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+   const hasTriggeredImport = useRef(false);
 
   useEffect(() => {
     loadProjects();
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get('import') === 'true' && !hasTriggeredImport.current) {
+      hasTriggeredImport.current = true;
+      importGit();
+    }
+  }, [searchParams]);
 
   const loadProjects = async () => {
     try {
       const response = await fetchWithAuth('/projects');
       if (!response.ok) throw new Error('Failed to load projects');
       const data = await response.json();
-      console.log('Project data:', data);
       setProjects(data);
     } catch (err) {
       setError(err.message);
@@ -26,6 +36,26 @@ function Dashboard() {
       setLoading(false);
     }
   };
+
+ const importGit = async () => {
+  const name = prompt('New project name:');
+  if (!name) return;
+  
+  try {
+    const response = await fetchWithAuth('/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+    
+    if (!response.ok) throw new Error('Failed to create project');
+    
+    const newProject = await response.json();
+    navigate(`/projects/${newProject.id}?linkgit=true`);
+  } catch (err) {
+    alert('Failed to create project: ' + err.message);
+  }
+}
 
   if (loading) {
     return (

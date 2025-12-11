@@ -1,14 +1,30 @@
-from flask import Blueprint, jsonify, request
+from flask import request, jsonify, Blueprint
 from models import db, Project, ProjectFile, FileAnalysis
 from routes.auth import token_required
 
 projects_bp = Blueprint('projects', __name__)
 
-@projects_bp.route('/projects', methods=['GET', 'OPTIONS'])
+@projects_bp.route('/projects', methods=['GET', 'OPTIONS', 'POST'])
 @token_required
 def get_projects(current_user):
     if request.method == "OPTIONS":
         return jsonify({"ok": True}), 200
+    if request.method == 'POST':
+        data = request.get_json()
+        name = data.get('name')
+        
+        if not name:
+            return jsonify({'error': 'Project name is required'}), 400
+        
+        new_project = Project(
+            name=name,
+            user_id=current_user.id
+        )
+        
+        db.session.add(new_project)
+        db.session.commit()
+        
+        return jsonify(new_project.to_dict()), 201
     
     projects = Project.query.filter_by(user_id=current_user.id).all()
     return jsonify([p.to_dict() for p in projects])
