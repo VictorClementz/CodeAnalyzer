@@ -32,7 +32,7 @@ class TestAuthRoutes:
         })
 
         assert response.status_code == 400
-        assert 'already exists' in response.json['error'].lower()
+        assert 'already registered' in response.json['error'].lower()
 
     def test_login_success(self, client, sample_user):
         response = client.post('/auth/login', json={
