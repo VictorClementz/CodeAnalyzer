@@ -1,0 +1,30 @@
+services:
+  # Backend
+  - type: web
+    name: code-analyzer-backend
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && gunicorn app:app"
+    envVars:
+      - key: FLASK_APP
+        value: app.py
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: code-analyzer-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  # Database
+  - type: pgsql
+    name: code-analyzer-db
+    region: frankfurt
+    plan: free
+    databaseName: db_cr
+    databaseUser: db_cr_user
