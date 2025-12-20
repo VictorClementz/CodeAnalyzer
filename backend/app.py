@@ -24,7 +24,7 @@ CORS(
 )
 
 
-# Database configuration
+#Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///codeanalyzer.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -32,13 +32,13 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 db.init_app(app)
 migrate = Migrate(app, db)
 
-with app.app_context():
-    try:
-        upgrade()
-    except Exception as e:
-        print("Migration failed:", e)
+if not app.config.get('TESTING'):
+    with app.app_context():
+        try:
+            upgrade()
+        except Exception as e:
+            print("Migration failed:", e)
 
-# Register blueprints
 app.register_blueprint(analyze_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(projects_bp)
