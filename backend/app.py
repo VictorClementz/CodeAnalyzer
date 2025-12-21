@@ -32,13 +32,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 db.init_app(app)
 migrate = Migrate(app, db)
 
-if not app.config.get('TESTING'):
-    with app.app_context():
-        try:
-            upgrade()
-        except Exception as e:
-            print("Migration failed:", e)
-
 app.register_blueprint(analyze_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(projects_bp)
@@ -48,5 +41,12 @@ def health_check():
     return {'status': 'running', 'message': 'Code Analyzer API'}
 
 if __name__ == '__main__':
+    # Run migrations when starting the app directly
+    with app.app_context():
+        try:
+            upgrade()
+        except Exception as e:
+            print("Migration failed:", e)
+
     port = int(os.environ.get('PORT', 5002))
     app.run(host='0.0.0.0', debug=False, port=port)

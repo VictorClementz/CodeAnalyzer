@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -24,7 +24,7 @@ def token_required(f):
             if token.startswith('Bearer '):
                 token = token[7:]
             
-            data = jwt.decode(token, os.environ.get('SECRET_KEY'), algorithms=['HS256'])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query.get(data['user_id'])
             
             if not current_user:
@@ -67,7 +67,7 @@ def signup():
     token = jwt.encode({
         'user_id': user.id,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30)
-    }, os.environ.get('SECRET_KEY'), algorithm='HS256')
+    }, current_app.config['SECRET_KEY'], algorithm='HS256')
     
     return jsonify({
         'message': 'User created successfully',
@@ -99,7 +99,7 @@ def login():
     token = jwt.encode({
         'user_id': user.id,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30)
-    }, os.environ.get('SECRET_KEY'), algorithm='HS256')
+    }, current_app.config['SECRET_KEY'], algorithm='HS256')
     
     return jsonify({
         'token': token,
