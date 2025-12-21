@@ -111,7 +111,9 @@ def link_git_repo(current_user, project_id):
     project.auto_detect_git = auto_detect
     
     db.session.commit()
-    
+    print(project.git_remote_url)
+    print(project.git_repo_path)
+
     return jsonify({
         'message': 'Git repository linked successfully',
         'project': project.to_dict()
@@ -142,19 +144,23 @@ def scan_git_repo(current_user, project_id):
         id=project_id,
         user_id=current_user.id
     ).first_or_404()
-    
+    print(f"--- DEBUG: Scanning Project ID {project_id}. Path in DB: '{project.git_repo_path}' ---")
     if not project.git_repo_path:
         return jsonify({'error': 'No git repository linked'}), 400
-    
+    print(f"got here?")
     from utils.git_utils import scan_repo_files
     from infrastructure.code_analyzer import analyze_code
     from utils.git_utils import get_git_info, get_code_hash
-    
-    # Scan for Python files
-    files_found = scan_repo_files(project.git_repo_path, language='python')
+
+    # Get language from request, default to 'python' for backward compatibility
+    data = request.get_json(silent=True) 
+    language = (data or {}).get('language', 'python').lower()
+
+    # Scan for files in the specified language
+    files_found = scan_repo_files(project.git_repo_path, language=language)
     
     if not files_found:
-        return jsonify({'message': 'No Python files found', 'files_analyzed': 0})
+        return jsonify({'message': f'No {language} files found', 'files_analyzed': 0})
     
     analyzed_count = 0
     errors = []
@@ -164,8 +170,8 @@ def scan_git_repo(current_user, project_id):
     
     for file_path, code in files_found:
         try:
-            # Run analysis
-            results = analyze_code(code, 'python')
+            # Run analysis with specified language
+            results = analyze_code(code, language)
             
             # Get or create file
             project_file = ProjectFile.query.filter_by(
@@ -177,7 +183,7 @@ def scan_git_repo(current_user, project_id):
                 project_file = ProjectFile(
                     project_id=project.id,
                     filename=file_path,
-                    language='python'
+                    language=language
                 )
                 db.session.add(project_file)
                 db.session.flush()

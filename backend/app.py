@@ -44,7 +44,8 @@ if __name__ == '__main__':
     # Run migrations when starting the app directly
     with app.app_context():
         try:
-            upgrade()
+            #db.create_all()
+          upgrade()
         except Exception as e:
             print("Migration failed:", e)
 

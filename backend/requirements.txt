@@ -1,6 +1,8 @@
 flask==3.0.0
 flask-cors==4.0.0
 radon==6.0.1
+esprima==4.0.1
+javalang==0.13.0
 gunicorn
 flask-sqlalchemy
 flask-migrate

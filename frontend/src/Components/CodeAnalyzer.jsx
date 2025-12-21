@@ -203,7 +203,7 @@ function CodeAnalyzer() {
       </div>
     </div>
     <h1 className="title"></h1>
-    <p className="subtitle">Quantify your code's maintainability and clarity(only python rn)</p>
+    <p className="subtitle">Quantify your code's maintainability and clarity (Python, JavaScript, TypeScript, Java)</p>
   </div>
 </header>
 
@@ -211,15 +211,15 @@ function CodeAnalyzer() {
         <div className="left-section">
           <div className="input-section">
             <div className="controls">
-              <select 
-                value={language} 
+              <select
+                value={language}
                 onChange={(e) => setLanguage(e.target.value)}
                 className="language-select"
               >
                 <option value="python">Python</option>
                 <option value="javascript">JavaScript</option>
+                <option value="typescript">TypeScript</option>
                 <option value="java">Java</option>
-                <option value="cpp">C++</option>
               </select>
               
               <button 

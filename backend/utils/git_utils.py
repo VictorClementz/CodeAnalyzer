@@ -70,11 +70,11 @@ def validate_git_repo(repo_path):
 def scan_repo_files(repo_path, language='python'):
     """
     Scan a git repository for code files
-    
+
     Args:
         repo_path: Path to git repository
-        language: Programming language to scan for ('python', 'javascript')
-    
+        language: Programming language to scan for ('python', 'javascript', 'typescript', 'java', 'cpp')
+
     Returns:
         List of tuples: [(relative_path, file_content), ...]
     """
@@ -85,6 +85,7 @@ def scan_repo_files(repo_path, language='python'):
     extensions = {
         'python': ['.py'],
         'javascript': ['.js', '.jsx'],
+        'typescript': ['.ts', '.tsx'],
         'java': ['.java'],
         'cpp': ['.cpp', '.cc', '.cxx', '.h', '.hpp']
     }
